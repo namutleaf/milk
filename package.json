@@ -1,0 +1,8 @@
+{
+  "name": "milk",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
