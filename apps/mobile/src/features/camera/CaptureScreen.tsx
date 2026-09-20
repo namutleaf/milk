@@ -3,12 +3,19 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
-import type { CameraFacing, FlashMode } from '@milk/core';
+import {
+  DEFAULT_MANUAL_EXPOSURE,
+  type CameraFacing,
+  type ExposureMode,
+  type FlashMode,
+  type ManualExposureSettings,
+} from '@milk/core';
 import { colors } from '@/theme/colors';
 import { PermissionGate } from './PermissionGate';
 import { CameraTopBar } from './CameraTopBar';
 import { CameraBottomBar } from './CameraBottomBar';
 import { PhotoReviewOverlay } from './PhotoReviewOverlay';
+import { ManualControlPanel } from './manual/ManualControlPanel';
 
 const FLASH_CYCLE: FlashMode[] = ['off', 'auto', 'on'];
 
@@ -23,6 +30,8 @@ export function CaptureScreen() {
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [exposureMode, setExposureMode] = useState<ExposureMode>('auto');
+  const [manualExposure, setManualExposure] = useState<ManualExposureSettings>(DEFAULT_MANUAL_EXPOSURE);
 
   const cameraRef = useRef<CameraView>(null);
 
@@ -70,6 +79,10 @@ export function CaptureScreen() {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }, []);
 
+  const handleToggleExposureMode = useCallback(() => {
+    setExposureMode((current) => (current === 'auto' ? 'manual' : 'auto'));
+  }, []);
+
   if (!cameraPermission) {
     return <View style={styles.container} />;
   }
@@ -101,6 +114,14 @@ export function CaptureScreen() {
         <SafeAreaView style={styles.overlay} pointerEvents="box-none">
           <CameraTopBar flash={flash} onToggleFlash={handleToggleFlash} />
           <View style={styles.spacer} />
+          {/* expo-camera has no manual exposure API, so this only previews the
+              interaction; wiring it to the sensor is the Phase 2 native module. */}
+          <ManualControlPanel
+            mode={exposureMode}
+            onToggleMode={handleToggleExposureMode}
+            settings={manualExposure}
+            onChange={setManualExposure}
+          />
           <CameraBottomBar
             onCapture={handleCapture}
             onFlip={handleFlip}
