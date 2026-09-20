@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
+import * as MediaLibrary from './mediaLibrary';
 import {
   DEFAULT_MANUAL_EXPOSURE,
   type CameraFacing,
